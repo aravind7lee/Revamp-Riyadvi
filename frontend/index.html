@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en" class="dark scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/Riyadvi-logo.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#050507" />
+
+    <!-- Primary SEO (defaults — SEOHead component overrides per-page) -->
+    <title>Riyadvi Software Technologies | Custom Software & Digital Solutions</title>
+    <meta name="description" content="Custom Software & Digital Solutions to Grow Your Business. Web & App Development, UI/UX Design, AR/VR, 3D Modeling & Business Strategy tailored to your needs." />
+    <meta name="keywords" content="Riyadvi Software Technologies, Web Development, App Development, UI/UX Design, AR/VR, 3D Modeling, Digital Marketing, Custom IT Solutions" />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="Riyadvi Software Technologies" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://riyadvisoftwaretechnologies.com/" />
+    <meta property="og:title" content="Riyadvi Software Technologies | Custom Software & Digital Solutions" />
+    <meta property="og:description" content="Custom Software & Digital Solutions to Grow Your Business. Web & App Development, UI/UX Design, and Business Strategy – all tailored to your needs." />
+    <meta property="og:site_name" content="Riyadvi Software Technologies" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Riyadvi Software Technologies | Custom Software & Digital Solutions" />
+    <meta name="twitter:description" content="Delivering cutting-edge custom IT solutions, web development, and consulting services for your business growth." />
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://riyadvisoftwaretechnologies.com/" />
+
+    <!-- Performance: Preconnect to external resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Google Fonts: Outfit, Inter, JetBrains Mono, Montserrat, Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Montserrat:wght@500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- ═══════════════════════════════════════════════════════════
+         GOOGLE ANALYTICS 4
+         Replace G-XXXXXXXXXX with your actual GA4 Measurement ID
+         ═══════════════════════════════════════════════════════════ -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-XXXXXXXXXX', {
+        page_path: window.location.pathname,
+        anonymize_ip: true
+      });
+    </script>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         META PIXEL (Facebook / Instagram Ads)
+         Replace XXXXXXXXXXXXXXXXXX with your actual Pixel ID
+         ═══════════════════════════════════════════════════════════ -->
+    <script>
+      !function(f,b,e,v,n,t,s){
+        if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window,document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', 'XXXXXXXXXXXXXXXXXX');
+      fbq('track', 'PageView');
+    </script>
+
+    <!-- JSON-LD Organization Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Riyadvi Software Technologies",
+      "url": "https://riyadvisoftwaretechnologies.com",
+      "description": "Custom Software & Digital Solutions — Web & App Development, UI/UX Design, AR/VR, 3D Modeling, and Business Strategy.",
+      "foundingDate": "2021",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "IN",
+        "addressRegion": "Tamil Nadu"
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer service",
+        "email": "contact@riyadvisoftwaretechnologies.com"
+      }
+    }
+    </script>
+  </head>
+  <body class="bg-dark-bg text-gray-100 font-sans antialiased selection:bg-gold selection:text-black overflow-x-hidden">
+
+    <!-- Meta Pixel noscript fallback (must be in body, not head) -->
+    <noscript>
+      <img height="1" width="1" style="display:none"
+        src="https://www.facebook.com/tr?id=XXXXXXXXXXXXXXXXXX&ev=PageView&noscript=1"
+        alt="" />
+    </noscript>
+
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
