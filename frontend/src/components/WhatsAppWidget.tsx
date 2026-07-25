@@ -1,18 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { X, Send } from 'lucide-react';
+import { X, Send, CheckCheck, Smile, Paperclip, Lock } from 'lucide-react';
 import { Analytics } from '../services/analytics';
 
 interface WhatsAppWidgetProps {
   phoneNumber?: string; // Format: country code + number without + or spaces (e.g. 919876543210)
-  prefilledMessage?: string;
-  buttonText?: string;
-  headerTitle?: string;
-  greetingText?: string;
-  openHour?: number; // 24-hour format (e.g. 9)
-  closeHour?: number; // 24-hour format (e.g. 21)
+  companyName?: string;
+  defaultMessage?: string;
 }
 
-// Official WhatsApp SVG Logo Icon
+// Authentic Official WhatsApp SVG Logo Icon
 const WhatsAppIcon: React.FC<{ className?: string }> = ({ className = "w-6 h-6" }) => (
   <svg
     viewBox="0 0 24 24"
@@ -25,30 +21,20 @@ const WhatsAppIcon: React.FC<{ className?: string }> = ({ className = "w-6 h-6" 
 );
 
 export const WhatsAppWidget: React.FC<WhatsAppWidgetProps> = ({
-  phoneNumber = '919876543210', // Default WhatsApp number formatted without +
-  prefilledMessage = "Hello! I'm interested in Riyadvi Software Technologies services.",
-  buttonText = 'Send message',
-  headerTitle = 'WhatsApp',
-  greetingText = 'Hello 👋, You can place your inquiry right here in the chat.',
-  openHour = 9,
-  closeHour = 21,
+  phoneNumber = '919876543210',
+  companyName = 'Riyadvi Software',
+  defaultMessage = "Hi! I'm interested in custom software development services.",
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [hasUnread, setHasUnread] = useState(true);
   const [currentTime, setCurrentTime] = useState('');
-  const [isOnline, setIsOnline] = useState(true);
+  const [messageInput, setMessageInput] = useState('');
 
-  // Check online status based on 24-hour business hours
   useEffect(() => {
     const now = new Date();
-    const currentHr = now.getHours();
-    const online = currentHr >= openHour && currentHr < closeHour;
-    setIsOnline(online);
-
-    // Format current time for speech bubble timestamp (e.g., 1:21 PM)
     const formatted = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     setCurrentTime(formatted);
-  }, [openHour, closeHour]);
+  }, []);
 
   const toggleWidget = () => {
     if (!isOpen) {
@@ -57,30 +43,56 @@ export const WhatsAppWidget: React.FC<WhatsAppWidgetProps> = ({
     setIsOpen(!isOpen);
   };
 
-  const handleSendMessage = () => {
+  const handleSend = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     Analytics.whatsappClick();
-    const encoded = encodeURIComponent(prefilledMessage);
+
+    const finalMsg = messageInput.trim() || defaultMessage;
+    const encoded = encodeURIComponent(finalMsg);
     
-    // Universal WhatsApp API link - directly prompts & opens WhatsApp Desktop App or Mobile App
+    // Official WhatsApp API redirect
     const whatsappUrl = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encoded}`;
     window.open(whatsappUrl, '_blank');
   };
 
   return (
-    <div className="fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-50 flex flex-col items-end select-none font-sans transition-all duration-300">
+    <div className="fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-[150] flex flex-col items-end select-none font-sans transition-all duration-300">
       
-      {/* ── VARIANT 2: OPEN CHAT MODAL WINDOW ── */}
+      {/* ── ORIGINAL WHATSAPP ICONIC LIGHT EMERALD THEME CHAT MODAL ── */}
       {isOpen && (
-        <div className="mb-4 w-[340px] xs:w-[360px] bg-[#0A0A0A] border border-[#222226] rounded-2xl shadow-2xl overflow-hidden animate-scaleIn transform origin-bottom-right">
+        <div className="mb-3 w-[320px] sm:w-[365px] bg-[#E5DDD5] border border-[#D1C7BD] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.4)] overflow-hidden animate-in fade-in zoom-in-95 duration-200 transform origin-bottom-right font-sans">
           
-          {/* HEADER BAR (WhatsApp Deep Teal Green) */}
-          <div className="bg-[#008069] px-4 py-3.5 text-white flex items-center justify-between shadow-md">
-            <div className="flex items-center gap-2.5">
-              <WhatsAppIcon className="w-6 h-6 text-white" />
-              <span className="font-display font-bold text-base tracking-tight text-white">
-                {headerTitle}
-              </span>
+          {/* ORIGINAL WHATSAPP DEEP TEAL HEADER (#075E54 / #128C7E) */}
+          <div className="bg-[#075E54] px-4 py-3.5 text-white flex items-center justify-between shadow-md">
+            <div className="flex items-center gap-3">
+              {/* Official Business Avatar */}
+              <div className="relative flex-shrink-0">
+                <div className="w-10 h-10 rounded-full bg-[#128C7E] border border-white/40 flex items-center justify-center text-white shadow-sm overflow-hidden">
+                  <img
+                    src="/Riyadvi-logo.png"
+                    alt="Riyadvi Logo"
+                    className="w-7 h-7 object-contain"
+                    onError={(e) => {
+                      (e.target as HTMLElement).style.display = 'none';
+                    }}
+                  />
+                  <WhatsAppIcon className="w-6 h-6 text-white hidden fallback-icon" />
+                </div>
+                {/* Active Online Indicator */}
+                <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-[#25D366] border-2 border-[#075E54]" />
+              </div>
+
+              <div>
+                <h4 className="font-bold text-sm text-white leading-tight">
+                  {companyName}
+                </h4>
+                <p className="text-[11px] text-[#25D366] font-semibold leading-none mt-0.5">
+                  online
+                </p>
+              </div>
             </div>
+
+            {/* Close Button */}
             <button
               onClick={() => setIsOpen(false)}
               className="p-1 rounded-full hover:bg-black/20 text-white/90 hover:text-white transition-colors cursor-pointer"
@@ -90,59 +102,93 @@ export const WhatsAppWidget: React.FC<WhatsAppWidgetProps> = ({
             </button>
           </div>
 
-          {/* CHAT INTERIOR BODY */}
-          <div className="p-4 bg-[#0A0A0A] space-y-5">
+          {/* ORIGINAL WHATSAPP CHAT WALLPAPER (#E5DDD5 / #ECE5DD) */}
+          <div
+            className="p-4 space-y-4 min-h-[200px] flex flex-col justify-between relative bg-[#E5DDD5]"
+            style={{
+              backgroundImage: `radial-gradient(#000000 0.4px, transparent 0.4px)`,
+              backgroundSize: '16px 16px',
+            }}
+          >
             
-            {/* SPEECH BUBBLE */}
-            <div className="bg-[#2B2D31] p-4 rounded-2xl text-white space-y-2 relative shadow-sm">
-              <p className="text-sm font-medium leading-snug text-gray-100">
-                {greetingText}
+            {/* DATE BADGE PILL */}
+            <div className="flex justify-center">
+              <span className="bg-[#FFFFFF] text-[#54656F] text-[10px] font-semibold px-3 py-1 rounded-md tracking-wide uppercase shadow-sm border border-black/5">
+                Today
+              </span>
+            </div>
+
+            {/* INCOMING WHATSAPP MESSAGE BUBBLE (Pure White #FFFFFF with Tail) */}
+            <div className="self-start max-w-[88%] bg-[#FFFFFF] p-3 rounded-tr-xl rounded-br-xl rounded-bl-xl text-[#111B21] space-y-1 relative shadow-[0_1px_3px_rgba(0,0,0,0.12)]">
+              {/* Message tail triangle */}
+              <div className="absolute top-0 -left-2 w-0 h-0 border-t-[8px] border-t-[#FFFFFF] border-l-[8px] border-l-transparent" />
+              
+              <p className="text-xs leading-relaxed text-[#111B21]">
+                Hello! 👋 Welcome to <strong className="text-black">Riyadvi Software Technologies</strong>.
               </p>
-              <div className="flex items-center justify-end gap-1 text-[10px] font-mono text-neutral-400">
-                <span>{currentTime || 'Just now'}</span>
+              <p className="text-xs leading-relaxed text-[#111B21]">
+                How can we assist you with your software project today?
+              </p>
+              
+              <div className="flex items-center justify-end gap-1 text-[10px] text-[#667781] pt-0.5">
+                <span>{currentTime || '12:00 PM'}</span>
+                <CheckCheck className="w-3.5 h-3.5 text-[#53BDEB]" />
               </div>
             </div>
 
-            {/* ONLINE / OFFLINE STATUS BADGE */}
-            <div className="flex items-center justify-center gap-1.5 text-[11px] font-mono text-neutral-400">
-              <span className={`w-2 h-2 rounded-full ${isOnline ? 'bg-[#25D366]' : 'bg-neutral-500'}`} />
-              <span>{isOnline ? 'Available for instant reply' : 'Currently offline — Leave a message'}</span>
+            {/* ENCRYPTION BADGE */}
+            <div className="flex items-center justify-center gap-1.5 bg-[#FFF4C4] text-[#54656F] text-[10px] py-1.5 px-3 rounded-lg border border-[#F5E6A3] shadow-xs font-sans">
+              <Lock className="w-3 h-3 text-[#54656F] flex-shrink-0" />
+              <span>End-to-end encrypted. Tap below to chat live.</span>
+            </div>
+          </div>
+
+          {/* ORIGINAL WHATSAPP LIGHT FOOTER INPUT BAR (#F0F2F5) */}
+          <form onSubmit={handleSend} className="bg-[#F0F2F5] p-2.5 flex items-center gap-2 border-t border-[#E0E2E5]">
+            <div className="flex items-center gap-1.5 text-[#54656F] px-1">
+              <Smile className="w-5 h-5 hover:text-[#111B21] cursor-pointer" />
+              <Paperclip className="w-5 h-5 hover:text-[#111B21] cursor-pointer hidden sm:block" />
             </div>
 
-            {/* ACTION BUTTON */}
+            <input
+              type="text"
+              value={messageInput}
+              onChange={(e) => setMessageInput(e.target.value)}
+              placeholder="Type a message..."
+              className="flex-1 bg-[#FFFFFF] text-[#111B21] placeholder-[#667781] text-xs px-3.5 py-2.5 rounded-full focus:outline-none border border-[#D1D5DB] focus:border-[#00A884] transition-colors shadow-inner"
+            />
+
+            {/* Iconic WhatsApp Green Send Button (#25D366 / #00A884) */}
             <button
-              onClick={handleSendMessage}
-              className={`w-full py-3.5 px-5 rounded-full font-bold text-sm flex items-center justify-center gap-2.5 transition-all shadow-lg cursor-pointer hover:scale-[1.02] active:scale-[0.98] ${
-                isOnline
-                  ? 'bg-[#25D366] hover:bg-[#20bd5a] text-white'
-                  : 'bg-[#DBD5D5] hover:bg-[#c9c3c3] text-black'
-              }`}
+              type="submit"
+              className="w-9 h-9 rounded-full bg-[#00A884] hover:bg-[#008f70] text-white flex items-center justify-center shadow-md transition-all cursor-pointer flex-shrink-0 active:scale-95"
+              aria-label="Send message to WhatsApp"
             >
-              <Send className="w-4 h-4 transform rotate-45" />
-              <span>{isOnline ? buttonText : 'Send Offline Message'}</span>
+              <Send className="w-4 h-4 transform rotate-45 -ml-0.5 text-white" />
             </button>
-          </div>
+          </form>
+
         </div>
       )}
 
-      {/* ── VARIANT 1: CLOSED / OPEN FLOATING TOGGLE BUTTON ── */}
+      {/* ── OFFICIAL VIBRANT WHATSAPP FLOATING BUTTON (#25D366) ── */}
       <button
         onClick={toggleWidget}
-        className={`relative w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 shadow-2xl cursor-pointer hover:scale-105 active:scale-95 ${
+        className={`relative w-13 h-13 sm:w-14 sm:h-14 rounded-full flex items-center justify-center transition-all duration-300 shadow-2xl cursor-pointer hover:scale-105 active:scale-95 ${
           isOpen
-            ? 'bg-[#25D366] text-white ring-4 ring-[#25D366]/30'
-            : 'bg-[#25D366] text-white hover:bg-[#20bd5a] ring-4 ring-[#25D366]/20'
+            ? 'bg-[#00A884] text-white ring-4 ring-[#00A884]/30'
+            : 'bg-[#25D366] text-white hover:bg-[#20bd5a] ring-4 ring-[#25D366]/30'
         }`}
         aria-label={isOpen ? 'Close WhatsApp Widget' : 'Open WhatsApp Widget'}
       >
         {isOpen ? (
-          <X className="w-7 h-7 text-white" />
+          <X className="w-6 h-6 text-white" />
         ) : (
           <>
-            <WhatsAppIcon className="w-8 h-8 text-white" />
+            <WhatsAppIcon className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
             {/* UNREAD NOTIFICATION BADGE (RED 1) */}
             {hasUnread && (
-              <span className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-[#FF3B30] text-white text-xs font-mono font-bold flex items-center justify-center border-2 border-black shadow-md animate-pulse">
+              <span className="absolute -top-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-[#FF3B30] text-white text-[10px] sm:text-xs font-mono font-bold flex items-center justify-center border-2 border-white shadow-md animate-pulse">
                 1
               </span>
             )}
