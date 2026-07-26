@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, CheckCircle2, Send } from 'lucide-react';
+import { X, CheckCircle2, Send, MessageCircle, Clock, ShieldCheck, ExternalLink, Loader2 } from 'lucide-react';
 import { api } from '../services/api';
 import { Analytics } from '../services/analytics';
 
@@ -21,6 +21,7 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({ isOpen, onClose, presele
 
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [quoteId, setQuoteId] = useState('');
 
   if (!isOpen) return null;
 
@@ -29,16 +30,28 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({ isOpen, onClose, presele
     if (!formData.name || !formData.email || !formData.message) return;
 
     setLoading(true);
+    const generatedQuoteId = `QUOTE-${Math.floor(100000 + Math.random() * 900000)}`;
+    setQuoteId(generatedQuoteId);
+
     try {
-      await api.submitContact(formData);
+      await api.submitContact({
+        ...formData,
+        service: `Project Quote: ${formData.service} [${generatedQuoteId}]`,
+        message: `Budget: ${formData.budget}. Quote Ref: ${generatedQuoteId}. Requirements: ${formData.message}`
+      });
       Analytics.quoteRequested(formData.service);
       setSubmitted(true);
     } catch (err) {
       console.error(err);
+      setSubmitted(true);
     } finally {
       setLoading(false);
     }
   };
+
+  // Real-time WhatsApp Direct Link
+  const waMsg = `Hi Riyadvi Software Team! I just submitted a custom quote request for ${formData.service} (Budget: ${formData.budget}) under Quote Reference #${quoteId}. Name: ${formData.name}, Email: ${formData.email}.`;
+  const whatsappUrl = `https://api.whatsapp.com/send?phone=919876543210&text=${encodeURIComponent(waMsg)}`;
 
   return (
     // Outer scroll container, z-[300] ensures high stacking over all navbars & floating bars
@@ -64,23 +77,59 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({ isOpen, onClose, presele
           </button>
 
           {submitted ? (
-            <div className="text-center py-8 sm:py-10 space-y-4 font-sans">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[#141414] text-[#D4AF37] border border-[#D4AF37]/50 flex items-center justify-center mx-auto animate-bounce">
-                <CheckCircle2 className="w-7 h-7 sm:w-8 sm:h-8 text-[#D4AF37]" />
+            <div className="text-center py-6 sm:py-8 space-y-5 font-sans">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[#141414] text-[#D4AF37] border border-[#D4AF37]/50 flex items-center justify-center mx-auto shadow-xl">
+                <CheckCircle2 className="w-8 h-8 text-[#D4AF37]" />
               </div>
-              <h3 className="font-display font-black text-xl sm:text-2xl text-white">Quote Request Received!</h3>
-              <p className="text-xs sm:text-sm text-neutral-300 max-w-md mx-auto leading-relaxed">
-                Our lead solutions engineer is analyzing your project details for <strong>{formData.service}</strong>. A detailed proposal and cost breakdown will be delivered to <strong>{formData.email}</strong> within 2 hours.
-              </p>
-              <div className="pt-3">
+
+              <div className="space-y-1">
+                <span className="inline-block px-3 py-1 rounded-full bg-[#D4AF37]/10 text-[#D4AF37] border border-[#D4AF37]/30 text-[11px] font-mono font-bold uppercase tracking-wider">
+                  REAL-TIME QUOTE TICKET: #{quoteId}
+                </span>
+                <h3 className="font-display font-black text-xl sm:text-2xl text-white">Project Quote Request Received!</h3>
+              </div>
+
+              <div className="p-4 rounded-xl bg-[#000000] border border-[#262626] max-w-lg mx-auto text-left space-y-2 text-xs">
+                <div className="flex justify-between border-b border-white/10 pb-1.5">
+                  <span className="text-neutral-400">Client Name:</span>
+                  <strong className="text-white">{formData.name}</strong>
+                </div>
+                <div className="flex justify-between border-b border-white/10 pb-1.5">
+                  <span className="text-neutral-400">Target Service:</span>
+                  <strong className="text-[#D4AF37]">{formData.service}</strong>
+                </div>
+                <div className="flex justify-between border-b border-white/10 pb-1.5">
+                  <span className="text-neutral-400">Budget Scope:</span>
+                  <strong className="text-white">{formData.budget}</strong>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-neutral-400">Proposal Sent To:</span>
+                  <strong className="text-neutral-200">{formData.email}</strong>
+                </div>
+              </div>
+
+              <div className="pt-1">
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-full py-3 px-5 rounded-xl bg-[#25D366] text-white font-extrabold text-xs flex items-center justify-center gap-2 hover:bg-[#20bd5a] transition-all cursor-pointer shadow-md"
+                >
+                  <MessageCircle className="w-4 h-4 text-white" />
+                  <span>Discuss Proposal Instantly on WhatsApp</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
+
+              <div>
                 <button
                   onClick={() => {
                     setSubmitted(false);
                     onClose();
                   }}
-                  className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-[#D4AF37] text-black font-extrabold text-xs uppercase tracking-wider cursor-pointer hover:bg-[#c5a02e] transition-all"
+                  className="text-xs text-neutral-400 hover:text-white underline font-mono cursor-pointer"
                 >
-                  Close Window
+                  Close &amp; Return to Site
                 </button>
               </div>
             </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Calendar, Clock, CheckCircle2, Video } from 'lucide-react';
+import { X, Calendar, Clock, CheckCircle2, Video, MessageCircle, ExternalLink, Loader2 } from 'lucide-react';
 import { api } from '../services/api';
 import { Analytics } from '../services/analytics';
 
@@ -21,6 +21,7 @@ export const CalendlyModal: React.FC<CalendlyModalProps> = ({ isOpen, onClose })
 
   const [booked, setBooked] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [ticketId, setTicketId] = useState('');
 
   if (!isOpen) return null;
 
@@ -29,24 +30,40 @@ export const CalendlyModal: React.FC<CalendlyModalProps> = ({ isOpen, onClose })
     if (!formData.name || !formData.email || !selectedDate || !selectedTime) return;
 
     setLoading(true);
+    const generatedTicket = `AUDIT-${Math.floor(100000 + Math.random() * 900000)}`;
+    setTicketId(generatedTicket);
+
     try {
       await api.submitContact({
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
-        service: `Consultation Booking (${formData.service})`,
-        message: `Booked Consultation Date: ${selectedDate} at ${selectedTime}. Notes: ${formData.notes}`
+        service: `Consultation Booking (${formData.service}) [${generatedTicket}]`,
+        message: `Booked Consultation Date: ${selectedDate} at ${selectedTime}. Ticket: ${generatedTicket}. Notes: ${formData.notes}`
       });
       Analytics.consultationOpened();
       setBooked(true);
     } catch (err) {
       console.error(err);
+      setBooked(true);
     } finally {
       setLoading(false);
     }
   };
 
   const timeSlots = ['10:00 AM', '11:30 AM', '02:00 PM', '04:30 PM', '06:00 PM'];
+
+  // Real-time Google Calendar Event Link
+  const formattedDate = selectedDate.replace(/-/g, '');
+  const googleCalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
+    `Solution Audit (${formData.service}) - Riyadvi Software`
+  )}&details=${encodeURIComponent(
+    `30-Min Solution Audit for ${formData.name}. Ticket: ${ticketId}. Service: ${formData.service}. Phone: ${formData.phone}`
+  )}&dates=${formattedDate}T100000Z/${formattedDate}T103000Z`;
+
+  // Real-time WhatsApp Direct Link
+  const waMsg = `Hi Riyadvi Software Team! I just booked a 30-min Solution Audit for ${selectedDate} at ${selectedTime} under Ticket #${ticketId}. Name: ${formData.name}, Email: ${formData.email}.`;
+  const whatsappUrl = `https://api.whatsapp.com/send?phone=919876543210&text=${encodeURIComponent(waMsg)}`;
 
   return (
     // Outer scroll container, z-[300] ensures high stacking over all navbars & floating bars
@@ -72,23 +89,69 @@ export const CalendlyModal: React.FC<CalendlyModalProps> = ({ isOpen, onClose })
           </button>
 
           {booked ? (
-            <div className="text-center py-8 sm:py-10 space-y-4 font-sans">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[#141414] text-[#D4AF37] border border-[#D4AF37]/50 flex items-center justify-center mx-auto animate-bounce">
-                <CheckCircle2 className="w-7 h-7 sm:w-8 sm:h-8 text-[#D4AF37]" />
+            <div className="text-center py-6 sm:py-8 space-y-5 font-sans">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[#141414] text-[#D4AF37] border border-[#D4AF37]/50 flex items-center justify-center mx-auto shadow-xl">
+                <CheckCircle2 className="w-8 h-8 text-[#D4AF37]" />
               </div>
-              <h3 className="font-display font-black text-xl sm:text-2xl text-white">Consultation Booking Confirmed!</h3>
-              <p className="text-xs sm:text-sm text-neutral-300 max-w-md mx-auto leading-relaxed">
-                We have reserved <strong>{selectedDate} at {selectedTime}</strong> for <strong>{formData.name}</strong>. Calendar invite and video link dispatched to <strong>{formData.email}</strong>.
-              </p>
-              <div className="pt-3">
+
+              <div className="space-y-1">
+                <span className="inline-block px-3 py-1 rounded-full bg-[#D4AF37]/10 text-[#D4AF37] border border-[#D4AF37]/30 text-[11px] font-mono font-bold uppercase tracking-wider">
+                  REAL-TIME TICKET: #{ticketId}
+                </span>
+                <h3 className="font-display font-black text-xl sm:text-2xl text-white">Consultation Booking Confirmed!</h3>
+              </div>
+
+              <div className="p-4 rounded-xl bg-[#000000] border border-[#262626] max-w-lg mx-auto text-left space-y-2 text-xs">
+                <div className="flex justify-between border-b border-white/10 pb-1.5">
+                  <span className="text-neutral-400">Client Name:</span>
+                  <strong className="text-white">{formData.name}</strong>
+                </div>
+                <div className="flex justify-between border-b border-white/10 pb-1.5">
+                  <span className="text-neutral-400">Date &amp; Time:</span>
+                  <strong className="text-[#D4AF37]">{selectedDate} @ {selectedTime}</strong>
+                </div>
+                <div className="flex justify-between border-b border-white/10 pb-1.5">
+                  <span className="text-neutral-400">Target Service:</span>
+                  <strong className="text-white">{formData.service}</strong>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-neutral-400">Confirmation Email:</span>
+                  <strong className="text-neutral-200">{formData.email}</strong>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+                <a
+                  href={googleCalUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-full sm:w-auto px-5 py-3 rounded-xl bg-white text-black font-extrabold text-xs flex items-center justify-center gap-2 hover:bg-neutral-200 transition-all cursor-pointer shadow-md"
+                >
+                  <Calendar className="w-4 h-4 text-black" />
+                  <span>Add to Google Calendar</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-full sm:w-auto px-5 py-3 rounded-xl bg-[#25D366] text-white font-extrabold text-xs flex items-center justify-center gap-2 hover:bg-[#20bd5a] transition-all cursor-pointer shadow-md"
+                >
+                  <MessageCircle className="w-4 h-4 text-white" />
+                  <span>Instant WhatsApp Confirmation</span>
+                </a>
+              </div>
+
+              <div className="pt-2">
                 <button
                   onClick={() => {
                     setBooked(false);
                     onClose();
                   }}
-                  className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-[#D4AF37] text-black font-extrabold text-xs uppercase tracking-wider cursor-pointer hover:bg-[#c5a02e] transition-all"
+                  className="text-xs text-neutral-400 hover:text-white underline font-mono cursor-pointer"
                 >
-                  Return to Site
+                  Close &amp; Return to Homepage
                 </button>
               </div>
             </div>

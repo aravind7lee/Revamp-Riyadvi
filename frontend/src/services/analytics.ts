@@ -12,17 +12,20 @@ declare global {
   }
 }
 
-export const GA_ID = import.meta.env.VITE_GA_MEASUREMENT_ID || 'G-XXXXXXXXXX';
-export const META_PIXEL_ID = import.meta.env.VITE_META_PIXEL_ID || 'XXXXXXXXXXXXXXXXXX';
+export const GA_ID = import.meta.env.VITE_GA_MEASUREMENT_ID || '';
+export const META_PIXEL_ID = import.meta.env.VITE_META_PIXEL_ID || '';
 
 /**
- * Auto-initialize GA4 and Meta Pixel scripts if not already present
+ * Auto-initialize GA4 and Meta Pixel scripts if valid IDs are configured
  */
 export const initAnalytics = () => {
   if (typeof window === 'undefined') return;
 
+  const isRealGA = Boolean(GA_ID && GA_ID !== 'G-XXXXXXXXXX' && /^G-[A-Z0-9]+$/i.test(GA_ID));
+  const isRealMeta = Boolean(META_PIXEL_ID && META_PIXEL_ID !== 'XXXXXXXXXXXXXXXXXX' && /^\d+$/.test(META_PIXEL_ID));
+
   // 1. Initialize GA4
-  if (GA_ID && GA_ID !== 'G-XXXXXXXXXX' && !window.gtag) {
+  if (isRealGA && !window.gtag) {
     console.log(`[Analytics]: Dynamic GA4 Init (${GA_ID})`);
     const script = document.createElement('script');
     script.async = true;
@@ -38,7 +41,7 @@ export const initAnalytics = () => {
   }
 
   // 2. Initialize Meta Pixel
-  if (META_PIXEL_ID && META_PIXEL_ID !== 'XXXXXXXXXXXXXXXXXX' && !window.fbq) {
+  if (isRealMeta && !window.fbq) {
     console.log(`[Analytics]: Dynamic Meta Pixel Init (${META_PIXEL_ID})`);
     (function (f: Window, b: Document, e: string, v: string) {
       if (f.fbq) return;
