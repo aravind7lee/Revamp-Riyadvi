@@ -6,49 +6,15 @@ interface PortfolioPreviewProps {
   onSelectCaseStudy: (item: PortfolioItem) => void;
 }
 
-// BrandAppart / Framer exact color palettes for the Stack Scroll Reveal cards
-const STACK_CARD_THEMES = [
-  {
-    bg: 'bg-[#A14E00]', // Warm Amber/Rust (Card 01)
-    border: 'border-[#E58025]',
-    numColor: 'text-[#FFD1A3]',
-    badgeBg: 'bg-[#6D3400] text-[#FFE8D1] border-[#E58025]/40',
-    btnBg: 'bg-[#FFD1A3] text-[#5C2B00] hover:bg-white',
-    imgBg: 'bg-[#FFF4E8]'
-  },
-  {
-    bg: 'bg-[#007A8C]', // Ocean Teal / Cyan (Card 02)
-    border: 'border-[#38BDF8]',
-    numColor: 'text-[#BEE7F5]',
-    badgeBg: 'bg-[#004D58] text-[#E0F7FC] border-[#38BDF8]/40',
-    btnBg: 'bg-[#BEE7F5] text-[#00424D] hover:bg-white',
-    imgBg: 'bg-[#F0FAFD]'
-  },
-  {
-    bg: 'bg-[#8B004F]', // Deep Magenta / Berry (Card 03)
-    border: 'border-[#F43F5E]',
-    numColor: 'text-[#FCD3DE]',
-    badgeBg: 'bg-[#580032] text-[#FFE4EC] border-[#F43F5E]/40',
-    btnBg: 'bg-[#FCD3DE] text-[#4A002A] hover:bg-white',
-    imgBg: 'bg-[#FFF0F5]'
-  },
-  {
-    bg: 'bg-[#4C1D95]', // Rich Violet / Purple (Card 04)
-    border: 'border-[#A855F7]',
-    numColor: 'text-[#E9D5FF]',
-    badgeBg: 'bg-[#321266] text-[#F3E8FF] border-[#A855F7]/40',
-    btnBg: 'bg-[#E9D5FF] text-[#2E1065] hover:bg-white',
-    imgBg: 'bg-[#FAF5FF]'
-  },
-  {
-    bg: 'bg-[#1C1917]', // Obsidian Dark Gold (Card 05)
-    border: 'border-[#D4AF37]',
-    numColor: 'text-[#FDE68A]',
-    badgeBg: 'bg-[#292524] text-[#FEF3C7] border-[#D4AF37]/40',
-    btnBg: 'bg-[#D4AF37] text-black hover:bg-white',
-    imgBg: 'bg-[#292524]'
-  }
-];
+// Unified single brand color palette for the Portfolio Stack Scroll cards (Obsidian Dark Gold)
+const UNIFIED_CARD_THEME = {
+  bg: 'bg-gradient-to-b from-[#11121C] to-[#08090F]', // Sleek Obsidian Dark Surface
+  border: 'border-[#D4AF37]/30 hover:border-[#D4AF37]',
+  numColor: 'text-[#D4AF37]',
+  badgeBg: 'bg-[#D4AF37]/10 text-[#D4AF37] border-[#D4AF37]/30',
+  btnBg: 'bg-[#D4AF37] text-black font-extrabold hover:bg-white',
+  imgBg: 'bg-[#141520] border-[#D4AF37]/25'
+};
 
 export const PortfolioPreview: React.FC<PortfolioPreviewProps> = ({ onSelectCaseStudy }) => {
   const [activeCategory, setActiveCategory] = useState<string>('All');
@@ -186,7 +152,7 @@ export const PortfolioPreview: React.FC<PortfolioPreviewProps> = ({ onSelectCase
         {viewMode === 'stack' && (
           <div className="space-y-8 sm:space-y-16 pb-12 sm:pb-16 pt-2">
             {filteredItems.map((item, idx) => {
-              const theme = STACK_CARD_THEMES[idx % STACK_CARD_THEMES.length];
+              const theme = UNIFIED_CARD_THEME;
               const stickyTopPx = 70 + idx * 12;
 
               return (
@@ -207,7 +173,7 @@ export const PortfolioPreview: React.FC<PortfolioPreviewProps> = ({ onSelectCase
                       transformOrigin: 'top center'
                     }}
                     onClick={() => onSelectCaseStudy(item)}
-                    className={`${theme.bg} ${theme.border} border-2 rounded-2xl sm:rounded-[28px] p-4 sm:p-9 shadow-[0_20px_50px_rgba(0,0,0,0.85)] group cursor-pointer hover:scale-[1.01] transition-transform duration-300`}
+                    className={`${theme.bg} ${theme.border} border-2 rounded-2xl sm:rounded-[28px] p-4 sm:p-9 shadow-[0_20px_50px_rgba(0,0,0,0.85)] group cursor-pointer hover:scale-[1.01] transition-all duration-300`}
                   >
                     {/* Inner 2-Column Responsive Grid */}
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-8 items-center">
@@ -226,23 +192,23 @@ export const PortfolioPreview: React.FC<PortfolioPreviewProps> = ({ onSelectCase
                         </div>
 
                         {/* Case Study Title */}
-                        <h3 className="font-display font-black text-lg sm:text-2xl md:text-3xl lg:text-4xl leading-tight tracking-tight text-white">
+                        <h3 className="font-display font-black text-lg sm:text-2xl md:text-3xl lg:text-4xl leading-tight tracking-tight text-white group-hover:text-[#D4AF37] transition-colors">
                           {item.title}
                         </h3>
 
                         {/* Summary Description */}
-                        <p className="text-white/90 text-xs sm:text-sm font-sans leading-relaxed line-clamp-2 sm:line-clamp-3">
+                        <p className="text-neutral-300 text-xs sm:text-sm font-sans leading-relaxed line-clamp-2 sm:line-clamp-3">
                           {item.summary}
                         </p>
 
                         {/* Key Metrics Grid */}
                         <div className="grid grid-cols-3 gap-1.5 sm:gap-2.5 pt-1">
                           {item.metrics.map((m, mIdx) => (
-                            <div key={mIdx} className="p-1.5 sm:p-2.5 rounded-lg sm:rounded-xl bg-black/35 border border-white/15 text-center">
-                              <span className="text-[8px] sm:text-[9px] text-white/70 uppercase tracking-wider block font-mono font-bold truncate">
+                            <div key={mIdx} className="p-1.5 sm:p-2.5 rounded-lg sm:rounded-xl bg-[#07080E] border border-white/10 text-center">
+                              <span className="text-[8px] sm:text-[9px] text-neutral-400 uppercase tracking-wider block font-mono font-bold truncate">
                                 {m.label}
                               </span>
-                              <span className="font-display font-black text-xs sm:text-sm text-white block mt-0.5">
+                              <span className="font-display font-black text-xs sm:text-sm text-[#D4AF37] block mt-0.5">
                                 {m.value}
                               </span>
                             </div>
@@ -255,7 +221,7 @@ export const PortfolioPreview: React.FC<PortfolioPreviewProps> = ({ onSelectCase
                             {item.toolsUsed.map((tool, tIdx) => (
                               <span
                                 key={tIdx}
-                                className="px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-mono bg-black/40 text-white/90 border border-white/20"
+                                className="px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-mono bg-black/60 text-neutral-300 border border-white/10"
                               >
                                 {tool}
                               </span>
@@ -270,7 +236,7 @@ export const PortfolioPreview: React.FC<PortfolioPreviewProps> = ({ onSelectCase
                             className={`w-full sm:w-auto px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl ${theme.btnBg} font-extrabold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg hover:scale-105 active:scale-95`}
                           >
                             <span>Read Full Case Study</span>
-                            <ArrowUpRight className="w-4 h-4 flex-shrink-0" />
+                            <ArrowUpRight className="w-4 h-4 flex-shrink-0 text-black" />
                           </button>
                         </div>
 
@@ -278,15 +244,15 @@ export const PortfolioPreview: React.FC<PortfolioPreviewProps> = ({ onSelectCase
 
                       {/* Right Column: Case Study Preview Image Frame */}
                       <div className="lg:col-span-5">
-                        <div className={`${theme.imgBg} p-1.5 sm:p-2 rounded-xl sm:rounded-2xl border border-white/30 shadow-xl overflow-hidden group`}>
+                        <div className={`${theme.imgBg} p-1.5 sm:p-2 rounded-xl sm:rounded-2xl border shadow-xl overflow-hidden group`}>
                           <div className="relative h-36 sm:h-64 rounded-lg sm:rounded-xl overflow-hidden">
                             <img
                               src={item.image}
                               alt={item.title}
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                            <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3 text-[10px] sm:text-[11px] font-mono font-bold text-white bg-black/70 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-md sm:rounded-lg border border-white/20">
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                            <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3 text-[10px] sm:text-[11px] font-mono font-bold text-white bg-black/80 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-md sm:rounded-lg border border-[#D4AF37]/30">
                               Client: {item.client}
                             </div>
                           </div>

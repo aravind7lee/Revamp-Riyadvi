@@ -97,6 +97,7 @@ export const ThreeDServiceCarousel: React.FC = () => {
   const [activeIdx, setActiveIdx] = useState(0);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   const total = SERVICE_CAROUSEL_ITEMS.length;
 
@@ -117,14 +118,15 @@ export const ThreeDServiceCarousel: React.FC = () => {
     setActiveIdx((prev) => (prev - 1 + total) % total);
   }, [total]);
 
-  // Auto-play timer (3.6s interval)
+  // Auto-play timer (3.6s interval) - Pauses on user hover/touch to avoid scroll thrashing
   useEffect(() => {
+    if (isHovered) return;
     const timer = setInterval(() => {
       setActiveIdx((prev) => (prev + 1) % total);
     }, 3600);
 
     return () => clearInterval(timer);
-  }, [total]);
+  }, [total, isHovered]);
 
   // Keyboard arrow keys listener
   useEffect(() => {
@@ -154,23 +156,25 @@ export const ThreeDServiceCarousel: React.FC = () => {
 
   return (
     <div
-      className="relative w-full py-4 sm:py-6 select-none overflow-hidden"
+      className="relative w-full py-4 sm:py-6 select-none overflow-hidden touch-pan-y"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       {/* BACKGROUND AMBIENT RADIAL GLOW BEHIND CENTER ACTIVE CARD */}
       <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] sm:w-[550px] h-[320px] sm:h-[550px] rounded-full pointer-events-none transition-all duration-700 blur-[80px] sm:blur-[100px] opacity-25"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] sm:w-[500px] h-[320px] sm:h-[500px] rounded-full pointer-events-none transition-colors duration-700 blur-[90px] opacity-20"
         style={{ backgroundColor: currentItem.accentColor }}
       />
 
       {/* STAGE CONTAINER WITH PERSPECTIVE */}
-      <div className="relative min-h-[500px] sm:min-h-[620px] flex items-center justify-center">
+      <div className="relative min-h-[480px] sm:min-h-[600px] flex items-center justify-center">
 
         {/* LEFT ARROW NAVIGATION BUTTON */}
         <button
           onClick={prevSlide}
-          className="absolute left-1 sm:left-6 lg:left-12 z-40 w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-[#0E0E12]/90 border border-[#262632] text-neutral-200 hover:border-[#D4AF37] hover:text-[#D4AF37] hover:bg-[#181822] active:scale-95 transition-all flex items-center justify-center cursor-pointer shadow-2xl backdrop-blur-lg group"
+          className="absolute left-1 sm:left-6 lg:left-12 z-40 w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-[#0E0E12] border border-[#262632] text-neutral-200 hover:border-[#D4AF37] hover:text-[#D4AF37] hover:bg-[#181822] active:scale-95 transition-all flex items-center justify-center cursor-pointer shadow-2xl group"
           aria-label="Previous Capability"
         >
           <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 transition-transform group-hover:-translate-x-0.5" />
@@ -179,7 +183,7 @@ export const ThreeDServiceCarousel: React.FC = () => {
         {/* RIGHT ARROW NAVIGATION BUTTON */}
         <button
           onClick={nextSlide}
-          className="absolute right-1 sm:right-6 lg:right-12 z-40 w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-[#0E0E12]/90 border border-[#262632] text-neutral-200 hover:border-[#D4AF37] hover:text-[#D4AF37] hover:bg-[#181822] active:scale-95 transition-all flex items-center justify-center cursor-pointer shadow-2xl backdrop-blur-lg group"
+          className="absolute right-1 sm:right-6 lg:right-12 z-40 w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-[#0E0E12] border border-[#262632] text-neutral-200 hover:border-[#D4AF37] hover:text-[#D4AF37] hover:bg-[#181822] active:scale-95 transition-all flex items-center justify-center cursor-pointer shadow-2xl group"
           aria-label="Next Capability"
         >
           <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 transition-transform group-hover:translate-x-0.5" />
@@ -187,91 +191,107 @@ export const ThreeDServiceCarousel: React.FC = () => {
 
         {/* 3D PERSPECTIVE CAROUSEL STAGE */}
         <div
-          className="w-full max-w-[1240px] h-[490px] sm:h-[550px] relative flex items-center justify-center"
+          className="w-full max-w-[1240px] h-[480px] sm:h-[540px] relative flex items-center justify-center"
           style={{ perspective: '1000px', transformStyle: 'preserve-3d' }}
         >
           {SERVICE_CAROUSEL_ITEMS.map((item, idx) => {
             let offset = idx - activeIdx;
-            if (offset > Math.floor(total / 2)) offset -= total;
-            if (offset < -Math.floor(total / 2)) offset += total;
+            if (offset > 3) offset -= total;
+            if (offset < -3) offset += total;
 
             const isCenter = offset === 0;
             const isLeft = offset === -1;
             const isRight = offset === 1;
             const isFarLeft = offset === -2;
             const isFarRight = offset === 2;
+            const isOffscreenRight = offset === 3;
+            const isOffscreenLeft = offset === -3;
 
-            // Compute dynamic responsive 3D transforms
+            // Compute dynamic responsive 3D transforms for continuous ring motion
             let transformStr = 'translateX(0px) rotateY(0deg) scale(1) translateZ(0px)';
             let opacityVal = 0;
             let zIndexVal = 10;
-            let filterVal = 'brightness(0.4)';
+            let visibilityVal: 'visible' | 'hidden' = 'visible';
             let pointerEventsVal: 'auto' | 'none' = 'none';
 
             if (isMobile) {
-              // Mobile 3D Coverflow Stage (Scaled 3D Perspective for small screens)
+              // Mobile 3D Coverflow Ring Stage
               if (isCenter) {
                 transformStr = 'translateX(0%) rotateY(0deg) scale(1.02) translateZ(0px)';
                 opacityVal = 1;
                 zIndexVal = 30;
-                filterVal = 'brightness(1)';
                 pointerEventsVal = 'auto';
               } else if (isLeft) {
-                transformStr = 'translateX(-58%) rotateY(28deg) scale(0.8) translateZ(-70px)';
-                opacityVal = 0.65;
+                transformStr = 'translateX(-58%) rotateY(26deg) scale(0.8) translateZ(-60px)';
+                opacityVal = 0.7;
                 zIndexVal = 20;
-                filterVal = 'brightness(0.55)';
                 pointerEventsVal = 'auto';
               } else if (isRight) {
-                transformStr = 'translateX(58%) rotateY(-28deg) scale(0.8) translateZ(-70px)';
-                opacityVal = 0.65;
+                transformStr = 'translateX(58%) rotateY(-26deg) scale(0.8) translateZ(-60px)';
+                opacityVal = 0.7;
                 zIndexVal = 20;
-                filterVal = 'brightness(0.55)';
                 pointerEventsVal = 'auto';
               } else if (isFarLeft) {
-                transformStr = 'translateX(-105%) rotateY(40deg) scale(0.6) translateZ(-140px)';
-                opacityVal = 0.15;
+                transformStr = 'translateX(-105%) rotateY(38deg) scale(0.6) translateZ(-120px)';
+                opacityVal = 0.2;
                 zIndexVal = 10;
-                filterVal = 'brightness(0.3)';
                 pointerEventsVal = 'none';
               } else if (isFarRight) {
-                transformStr = 'translateX(105%) rotateY(-40deg) scale(0.6) translateZ(-140px)';
-                opacityVal = 0.15;
+                transformStr = 'translateX(105%) rotateY(-38deg) scale(0.6) translateZ(-120px)';
+                opacityVal = 0.2;
                 zIndexVal = 10;
-                filterVal = 'brightness(0.3)';
+                pointerEventsVal = 'none';
+              } else if (isOffscreenRight) {
+                transformStr = 'translateX(150%) rotateY(-50deg) scale(0.4) translateZ(-180px)';
+                opacityVal = 0;
+                visibilityVal = 'hidden';
+                zIndexVal = 1;
+                pointerEventsVal = 'none';
+              } else if (isOffscreenLeft) {
+                transformStr = 'translateX(-150%) rotateY(50deg) scale(0.4) translateZ(-180px)';
+                opacityVal = 0;
+                visibilityVal = 'hidden';
+                zIndexVal = 1;
                 pointerEventsVal = 'none';
               }
             } else {
-              // Desktop 3D Coverflow Stage (sm+)
+              // Desktop 3D Coverflow Ring Stage (sm+)
               if (isCenter) {
                 transformStr = 'translateX(0%) rotateY(0deg) scale(1.05) translateZ(0px)';
                 opacityVal = 1;
                 zIndexVal = 30;
-                filterVal = 'brightness(1)';
                 pointerEventsVal = 'auto';
               } else if (isLeft) {
-                transformStr = 'translateX(-78%) rotateY(32deg) scale(0.85) translateZ(-90px)';
+                transformStr = 'translateX(-76%) rotateY(28deg) scale(0.85) translateZ(-80px)';
                 opacityVal = 0.75;
                 zIndexVal = 20;
-                filterVal = 'brightness(0.68)';
                 pointerEventsVal = 'auto';
               } else if (isRight) {
-                transformStr = 'translateX(78%) rotateY(-32deg) scale(0.85) translateZ(-90px)';
+                transformStr = 'translateX(76%) rotateY(-28deg) scale(0.85) translateZ(-80px)';
                 opacityVal = 0.75;
                 zIndexVal = 20;
-                filterVal = 'brightness(0.68)';
                 pointerEventsVal = 'auto';
               } else if (isFarLeft) {
-                transformStr = 'translateX(-135%) rotateY(46deg) scale(0.65) translateZ(-180px)';
-                opacityVal = 0.15;
+                transformStr = 'translateX(-132%) rotateY(42deg) scale(0.65) translateZ(-160px)';
+                opacityVal = 0.25;
                 zIndexVal = 10;
-                filterVal = 'brightness(0.3)';
                 pointerEventsVal = 'none';
               } else if (isFarRight) {
-                transformStr = 'translateX(135%) rotateY(-46deg) scale(0.65) translateZ(-180px)';
-                opacityVal = 0.15;
+                transformStr = 'translateX(132%) rotateY(-42deg) scale(0.65) translateZ(-160px)';
+                opacityVal = 0.25;
                 zIndexVal = 10;
-                filterVal = 'brightness(0.3)';
+                pointerEventsVal = 'none';
+              } else if (isOffscreenRight) {
+                transformStr = 'translateX(180%) rotateY(-55deg) scale(0.45) translateZ(-220px)';
+                opacityVal = 0;
+                visibilityVal = 'hidden';
+                zIndexVal = 1;
+                pointerEventsVal = 'none';
+              } else if (isOffscreenLeft) {
+                transformStr = 'translateX(-180%) rotateY(55deg) scale(0.45) translateZ(-220px)';
+                opacityVal = 0;
+                visibilityVal = 'hidden';
+                zIndexVal = 1;
                 pointerEventsVal = 'none';
               }
             }
@@ -283,45 +303,54 @@ export const ThreeDServiceCarousel: React.FC = () => {
                   if (isLeft) prevSlide();
                   if (isRight) nextSlide();
                 }}
-                className="absolute w-[240px] xs:w-[270px] sm:w-[350px] md:w-[370px] h-[470px] sm:h-[520px] rounded-[24px] sm:rounded-[28px] overflow-hidden cursor-pointer"
+                className="absolute w-[240px] xs:w-[270px] sm:w-[350px] md:w-[370px] h-[460px] sm:h-[510px] rounded-[24px] sm:rounded-[28px] overflow-hidden cursor-pointer group"
                 style={{
                   transform: transformStr,
                   opacity: opacityVal,
                   zIndex: zIndexVal,
-                  filter: filterVal,
+                  visibility: visibilityVal,
                   pointerEvents: pointerEventsVal,
                   backgroundColor: '#09090D',
                   border: isCenter ? `1.5px solid ${item.accentColor}` : '1px solid #1E1E26',
                   boxShadow: isCenter
-                    ? `0 30px 60px -15px rgba(0,0,0,0.95), 0 0 35px ${item.accentColor}35`
-                    : '0 15px 35px rgba(0,0,0,0.8)',
-                  transition: 'transform 0.65s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.65s ease, filter 0.65s ease'
+                    ? `0 25px 50px -10px rgba(0,0,0,0.9)`
+                    : '0 10px 25px rgba(0,0,0,0.7)',
+                  willChange: 'transform, opacity',
+                  WebkitBackfaceVisibility: 'hidden',
+                  backfaceVisibility: 'hidden',
+                  transition: 'transform 0.55s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.55s cubic-bezier(0.25, 1, 0.5, 1)'
                 }}
               >
+                {/* Non-Center Card Dimming Overlay (Replaces CPU-expensive brightness filter) */}
+                {!isCenter && (
+                  <div className="absolute inset-0 bg-black/45 pointer-events-none z-20 transition-opacity duration-300" />
+                )}
+
                 {/* TOP IMAGE SECTION */}
-                <div className="relative h-[260px] sm:h-[310px] w-full overflow-hidden">
+                <div className="relative h-[250px] sm:h-[300px] w-full overflow-hidden bg-[#09090D]">
                   <img
                     src={item.image}
                     alt={item.title}
-                    className="w-full h-full object-cover transition-transform duration-1000 ease-out hover:scale-105"
+                    loading="lazy"
+                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#09090D] via-[#09090D]/30 to-transparent" />
 
                   {/* TOP BADGE LABEL */}
                   <div className="absolute top-3.5 left-4 sm:top-4 sm:left-5 z-10 flex items-center gap-2">
-                    <span className={`px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-[9px] font-mono font-bold tracking-widest uppercase border backdrop-blur-md ${item.badgeBg}`}>
+                    <span className={`px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-[9px] font-mono font-bold tracking-widest uppercase border bg-[#09090D]/80 ${item.badgeBg}`}>
                       {item.badge}
                     </span>
                   </div>
 
                   {/* CARD COUNT INDEX IN TOP RIGHT */}
-                  <div className="absolute top-3.5 right-4 sm:top-4 sm:right-5 z-10 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg bg-black/60 border border-white/10 backdrop-blur-md text-[10px] font-mono font-bold text-neutral-300">
+                  <div className="absolute top-3.5 right-4 sm:top-4 sm:right-5 z-10 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg bg-black/80 border border-white/10 text-[10px] font-mono font-bold text-neutral-300">
                     0{idx + 1} / 0{total}
                   </div>
                 </div>
 
                 {/* BOTTOM CONTENT AREA */}
-                <div className="p-5 sm:p-6 pt-2 space-y-2.5 sm:space-y-3 flex flex-col justify-between h-[210px] bg-[#09090D]">
+                <div className="p-5 sm:p-6 pt-2 space-y-2.5 sm:space-y-3 flex flex-col justify-between h-[210px] bg-[#09090D] relative z-10">
                   <div className="space-y-1.5 sm:space-y-2">
                     {/* TITLE */}
                     <h3 className="font-display font-bold text-lg sm:text-2xl text-white tracking-tight leading-snug">

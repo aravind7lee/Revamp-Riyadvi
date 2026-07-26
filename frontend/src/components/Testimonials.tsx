@@ -8,6 +8,7 @@ export const Testimonials: React.FC = () => {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const total = TESTIMONIALS_DATA.length;
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const touchStartX = useRef<number | null>(null);
 
   const nextSlide = useCallback(() => {
     setActiveIndex((prev) => (prev + 1) % total);
@@ -16,6 +17,26 @@ export const Testimonials: React.FC = () => {
   const prevSlide = useCallback(() => {
     setActiveIndex((prev) => (prev - 1 + total) % total);
   }, [total]);
+
+  // Mobile Touch Swipe Handlers (Left/Right swipe for mobile screens)
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchStartX.current - touchEndX;
+
+    if (Math.abs(diff) > 35) {
+      if (diff > 0) {
+        nextSlide(); // Swiped left -> next testimonial
+      } else {
+        prevSlide(); // Swiped right -> prev testimonial
+      }
+    }
+    touchStartX.current = null;
+  };
 
   // Auto-play timer
   useEffect(() => {
@@ -69,7 +90,9 @@ export const Testimonials: React.FC = () => {
 
         {/* ORBITAL CAROUSEL STAGE CONTAINER - Perfectly Sized */}
         <div
-          className="relative h-[300px] sm:h-[320px] flex items-center justify-center select-none overflow-visible"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          className="relative h-[300px] sm:h-[320px] flex items-center justify-center select-none overflow-visible touch-pan-y"
           onMouseEnter={() => setIsAutoPlaying(false)}
           onMouseLeave={() => setIsAutoPlaying(true)}
         >

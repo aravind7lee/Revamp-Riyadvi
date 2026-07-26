@@ -71,6 +71,7 @@ const AV_COLORS = ['bg-violet-600', 'bg-sky-600', 'bg-emerald-700', 'bg-orange-6
 export const Hero: React.FC<HeroProps> = ({ onOpenCalendly, onScrollToLeadMagnet }) => {
   const [current, setCurrent] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const touchStartX = useRef<number | null>(null);
 
   // Preload all 4 hero images into browser memory immediately on mount to prevent any slow loading delays
   useEffect(() => {
@@ -108,6 +109,26 @@ export const Hero: React.FC<HeroProps> = ({ onOpenCalendly, onScrollToLeadMagnet
   const nextSlide = () => {
     setCurrent((c) => (c + 1) % SLIDES.length);
     startCycle();
+  };
+
+  // Mobile Touch Swipe Handlers (Left/Right swipe for mobile screens)
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchStartX.current - touchEndX;
+
+    if (Math.abs(diff) > 35) {
+      if (diff > 0) {
+        nextSlide(); // Swiped left -> next slide
+      } else {
+        prevSlide(); // Swiped right -> prev slide
+      }
+    }
+    touchStartX.current = null;
   };
 
   return (
@@ -249,7 +270,9 @@ export const Hero: React.FC<HeroProps> = ({ onOpenCalendly, onScrollToLeadMagnet
 
               {/* Main Slideshow Frame */}
               <div
-                className="relative rounded-2xl overflow-hidden bg-[#0A0A0A] border border-[#1F1F2C] border-t-2 border-t-[#D4AF37]/70 shadow-[0_20px_50px_rgba(0,0,0,0.8)]"
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
+                className="relative rounded-2xl overflow-hidden bg-[#0A0A0A] border border-[#1F1F2C] border-t-2 border-t-[#D4AF37]/70 shadow-[0_20px_50px_rgba(0,0,0,0.8)] touch-pan-y select-none"
                 style={{ aspectRatio: '4/3' }}
               >
                 {/* Image Slides */}

@@ -60,7 +60,7 @@ export const WhatsAppWidget: React.FC<WhatsAppWidgetProps> = ({
       
       {/* ── ORIGINAL WHATSAPP ICONIC LIGHT EMERALD THEME CHAT MODAL ── */}
       {isOpen && (
-        <div className="mb-3 w-[320px] sm:w-[365px] bg-[#E5DDD5] border border-[#D1C7BD] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.4)] overflow-hidden animate-in fade-in zoom-in-95 duration-200 transform origin-bottom-right font-sans">
+        <div className="mb-3 w-[calc(100vw-32px)] max-w-[365px] sm:w-[365px] bg-[#E5DDD5] border border-[#D1C7BD] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.4)] overflow-hidden animate-in fade-in zoom-in-95 duration-200 transform origin-bottom-right font-sans">
           
           {/* ORIGINAL WHATSAPP DEEP TEAL HEADER (#075E54 / #128C7E) */}
           <div className="bg-[#075E54] px-4 py-3.5 text-white flex items-center justify-between shadow-md">
@@ -174,7 +174,7 @@ export const WhatsAppWidget: React.FC<WhatsAppWidgetProps> = ({
       {/* ── OFFICIAL VIBRANT WHATSAPP FLOATING BUTTON (#25D366) ── */}
       <button
         onClick={toggleWidget}
-        className={`relative w-13 h-13 sm:w-14 sm:h-14 rounded-full flex items-center justify-center transition-all duration-300 shadow-2xl cursor-pointer hover:scale-105 active:scale-95 ${
+        className={`relative w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-all duration-300 shadow-[0_10px_25px_rgba(37,211,102,0.4)] cursor-pointer hover:scale-105 active:scale-95 flex-shrink-0 ${
           isOpen
             ? 'bg-[#00A884] text-white ring-4 ring-[#00A884]/30'
             : 'bg-[#25D366] text-white hover:bg-[#20bd5a] ring-4 ring-[#25D366]/30'
@@ -182,13 +182,13 @@ export const WhatsAppWidget: React.FC<WhatsAppWidgetProps> = ({
         aria-label={isOpen ? 'Close WhatsApp Widget' : 'Open WhatsApp Widget'}
       >
         {isOpen ? (
-          <X className="w-6 h-6 text-white" />
+          <X className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
         ) : (
           <>
-            <WhatsAppIcon className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
-            {/* UNREAD NOTIFICATION BADGE (RED 1) */}
+            <WhatsAppIcon className="w-8 h-8 sm:w-9 sm:h-9 text-white flex-shrink-0" />
+            {/* UNREAD NOTIFICATION BADGE (PERFECT ROUND CIRCLE RED 1) */}
             {hasUnread && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-[#FF3B30] text-white text-[10px] sm:text-xs font-mono font-bold flex items-center justify-center border-2 border-white shadow-md animate-pulse">
+              <span className="absolute -top-1 -right-1 w-6 h-6 sm:w-7 sm:h-7 aspect-square rounded-full bg-[#FF3B30] text-white text-xs sm:text-sm font-sans font-black flex items-center justify-center border-2 border-white shadow-lg flex-shrink-0 leading-none z-20">
                 1
               </span>
             )}
