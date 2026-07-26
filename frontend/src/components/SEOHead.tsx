@@ -21,8 +21,11 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
   structuredData,
 }) => {
   useEffect(() => {
-    // Title
-    document.title = `${title} | ${BRAND}`;
+    // Ensure Brand Name appears FIRST in browser tab right after favicon icon
+    const fullTitle = title.includes(BRAND)
+      ? title
+      : `${BRAND} | ${title}`;
+    document.title = fullTitle;
 
     const setMeta = (name: string, content: string, isProperty = false) => {
       const attr = isProperty ? 'property' : 'name';
@@ -44,6 +47,11 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
       }
       el.setAttribute('href', href);
     };
+
+    // Ensure favicon is set on every page load
+    setLink('icon', '/Riyadvi-logo.png');
+    setLink('shortcut icon', '/Riyadvi-logo.png');
+    setLink('apple-touch-icon', '/Riyadvi-logo.png');
 
     // Standard meta
     setMeta('description', description);

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { PORTFOLIO_DATA, PortfolioItem } from '../data/mockData';
 import { ArrowUpRight, Grid, Layers } from 'lucide-react';
+import { ScrollReveal } from './ScrollReveal';
 
 interface PortfolioPreviewProps {
   onSelectCaseStudy: (item: PortfolioItem) => void;

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { TrendingUp, CheckCircle2 } from 'lucide-react';
+import { ScrollReveal } from './ScrollReveal';
 
 interface GrowthSeries {
   year: string;
@@ -39,22 +40,25 @@ export const ServicesGrowthChart: React.FC = () => {
       <div className="max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 relative z-10 space-y-6 sm:space-y-10">
         
         {/* COMPACT SECTION HEADER */}
-        <div className="text-center max-w-2xl mx-auto space-y-1.5 sm:space-y-2">
-          <p className="text-[10px] sm:text-xs font-mono font-bold uppercase tracking-[0.2em] text-[#D4AF37]">
-            PERFORMANCE METRICS
-          </p>
-          
-          <h2 className="font-display font-extrabold text-2xl sm:text-4xl text-white tracking-tight leading-tight">
-            Services Growth &amp; Performance Metrics
-          </h2>
-          
-          <p className="text-neutral-400 text-xs sm:text-base leading-relaxed font-sans">
-            Year-over-year project delivery growth across App Development, Web Development, and Digital Marketing (2021 – 2024).
-          </p>
-        </div>
+        <ScrollReveal direction="up">
+          <div className="text-center max-w-2xl mx-auto space-y-1.5 sm:space-y-2">
+            <p className="text-[10px] sm:text-xs font-mono font-bold uppercase tracking-[0.2em] text-[#D4AF37]">
+              PERFORMANCE METRICS
+            </p>
+            
+            <h2 className="font-display font-extrabold text-2xl sm:text-4xl text-white tracking-tight leading-tight">
+              Services Growth &amp; Performance Metrics
+            </h2>
+            
+            <p className="text-neutral-400 text-xs sm:text-base leading-relaxed font-sans">
+              Year-over-year project delivery growth across App Development, Web Development, and Digital Marketing (2021 – 2024).
+            </p>
+          </div>
+        </ScrollReveal>
 
         {/* COMPACT CHART CONTAINER */}
-        <div className="bg-[#0A0A10] border border-[#1C1C28] rounded-2xl p-3 sm:p-8 shadow-2xl space-y-5 sm:space-y-8">
+        <ScrollReveal direction="scale" delay={150}>
+          <div className="bg-[#0A0A10] border border-[#1C1C28] rounded-2xl p-3 sm:p-8 shadow-2xl space-y-5 sm:space-y-8">
           
           {/* CHART LEGEND (TOP CENTER) */}
           <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-[11px] sm:text-sm font-sans font-medium text-neutral-300">
@@ -247,7 +251,8 @@ export const ServicesGrowthChart: React.FC = () => {
             </span>
           </div>
 
-        </div>
+          </div>
+        </ScrollReveal>
 
       </div>
     </section>

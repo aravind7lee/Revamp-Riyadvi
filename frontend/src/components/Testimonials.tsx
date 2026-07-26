@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { TESTIMONIALS_DATA } from '../data/mockData';
 import { Star, ChevronLeft, ChevronRight, Award } from 'lucide-react';
+import { ScrollReveal } from './ScrollReveal';
 
 export const Testimonials: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -76,17 +77,19 @@ export const Testimonials: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 relative z-10">
         
         {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto space-y-2">
-          <p className="text-xs font-mono font-bold uppercase tracking-[0.2em] text-[#D4AF37]">
-            CLIENT TESTIMONIALS
-          </p>
-          <h2 className="font-display font-extrabold text-3xl sm:text-4xl text-white tracking-tight">
-            What Our Clients Say About Working With Us
-          </h2>
-          <p className="text-neutral-400 text-xs sm:text-sm font-sans max-w-xl mx-auto">
-            Read reviews and feedback from founders, product managers, and technology leaders who have partnered with us.
-          </p>
-        </div>
+        <ScrollReveal direction="up">
+          <div className="text-center max-w-2xl mx-auto space-y-2">
+            <p className="text-xs font-mono font-bold uppercase tracking-[0.2em] text-[#D4AF37]">
+              CLIENT TESTIMONIALS
+            </p>
+            <h2 className="font-display font-extrabold text-3xl sm:text-4xl text-white tracking-tight">
+              What Our Clients Say About Working With Us
+            </h2>
+            <p className="text-neutral-400 text-xs sm:text-sm font-sans max-w-xl mx-auto">
+              Read reviews and feedback from founders, product managers, and technology leaders who have partnered with us.
+            </p>
+          </div>
+        </ScrollReveal>
 
         {/* ORBITAL CAROUSEL STAGE CONTAINER - Perfectly Sized */}
         <div
