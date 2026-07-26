@@ -2,8 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { X, Send, CheckCheck, Smile, Paperclip, Lock } from 'lucide-react';
 import { Analytics } from '../services/analytics';
 
+// Premium filled phone handset SVG icon
+const PhoneCallIcon: React.FC<{ className?: string }> = ({ className = 'w-6 h-6' }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className} xmlns="http://www.w3.org/2000/svg">
+    <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1C10.61 21 3 13.39 3 4c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.24 1.02l-2.21 2.2z" />
+  </svg>
+);
+
 interface WhatsAppWidgetProps {
   phoneNumber?: string; // Format: country code + number without + or spaces (e.g. 919876543210)
+  callNumber?: string;
   companyName?: string;
   defaultMessage?: string;
 }
@@ -21,7 +29,8 @@ const WhatsAppIcon: React.FC<{ className?: string }> = ({ className = "w-6 h-6" 
 );
 
 export const WhatsAppWidget: React.FC<WhatsAppWidgetProps> = ({
-  phoneNumber = '919876543210',
+  phoneNumber = '918072487427',
+  callNumber = '+918072487427',
   companyName = 'Riyadvi Software',
   defaultMessage = "Hi! I'm interested in custom software development services.",
 }) => {
@@ -56,11 +65,11 @@ export const WhatsAppWidget: React.FC<WhatsAppWidgetProps> = ({
   };
 
   return (
-    <div className="fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-[150] flex flex-col items-end select-none font-sans transition-all duration-300">
+    <div className="fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-[150] flex flex-col items-end gap-2.5 select-none font-sans transition-all duration-300">
       
       {/* ── ORIGINAL WHATSAPP ICONIC LIGHT EMERALD THEME CHAT MODAL ── */}
       {isOpen && (
-        <div className="mb-3 w-[calc(100vw-32px)] max-w-[365px] sm:w-[365px] bg-[#E5DDD5] border border-[#D1C7BD] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.4)] overflow-hidden animate-in fade-in zoom-in-95 duration-200 transform origin-bottom-right font-sans">
+        <div className="mb-2 w-[calc(100vw-32px)] max-w-[365px] sm:w-[365px] bg-[#E5DDD5] border border-[#D1C7BD] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.4)] overflow-hidden animate-in fade-in zoom-in-95 duration-200 transform origin-bottom-right font-sans">
           
           {/* ORIGINAL WHATSAPP DEEP TEAL HEADER (#075E54 / #128C7E) */}
           <div className="bg-[#075E54] px-4 py-3.5 text-white flex items-center justify-between shadow-md">
@@ -170,6 +179,16 @@ export const WhatsAppWidget: React.FC<WhatsAppWidgetProps> = ({
 
         </div>
       )}
+
+      {/* ── FLOATING DIRECT PHONE CALL BUTTON ── */}
+      <a
+        href={`tel:${callNumber}`}
+        className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#0D0D0D] border-[3px] border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black flex items-center justify-center transition-all duration-300 shadow-[0_8px_24px_rgba(212,175,55,0.35)] cursor-pointer hover:scale-105 active:scale-95 flex-shrink-0 group ring-4 ring-[#D4AF37]/20"
+        title={`Call Us Directly (${callNumber})`}
+        aria-label={`Call ${callNumber}`}
+      >
+        <PhoneCallIcon className="w-7 h-7 sm:w-8 sm:h-8 transition-transform group-hover:scale-110" />
+      </a>
 
       {/* ── OFFICIAL VIBRANT WHATSAPP FLOATING BUTTON (#25D366) ── */}
       <button

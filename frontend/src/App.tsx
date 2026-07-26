@@ -15,13 +15,52 @@ import { CalendlyModal } from './components/CalendlyModal';
 import { QuoteModal } from './components/QuoteModal';
 import { trackPageView } from './services/analytics';
 
-// Scroll to top + track page view on route change
+// Scroll to top, track page view & auto-observe all sections for scroll reveal animations
 const RouteObserver: React.FC = () => {
   const location = useLocation();
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
     trackPageView(location.pathname);
+
+    // Give DOM a tick to complete rendering on route changes
+    const timer = setTimeout(() => {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible', 'is-revealed');
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.05, rootMargin: '0px 0px -30px 0px' }
+      );
+
+      // Automatically query all sections, cards, and reveal elements across all pages
+      const elements = document.querySelectorAll(
+        'section, .reveal-on-scroll, .reveal-auto, .card-professional, .glass-card'
+      );
+
+      elements.forEach((el) => {
+        if (!el.classList.contains('reveal-on-scroll')) {
+          el.classList.add('reveal-on-scroll', 'reveal-up');
+        }
+        // Check if element is already in viewport
+        const rect = el.getBoundingClientRect();
+        if (rect.top < window.innerHeight && rect.bottom > 0) {
+          el.classList.add('is-visible', 'is-revealed');
+        } else {
+          observer.observe(el);
+        }
+      });
+
+      return () => observer.disconnect();
+    }, 80);
+
+    return () => clearTimeout(timer);
   }, [location.pathname]);
+
   return null;
 };
 
