@@ -1,8 +1,13 @@
 # 🚀 Riyadvi Software Technologies — Enterprise Platform Revamp
 
+
 A high-performance, full-stack enterprise digital platform revamp for **Riyadvi Software Technologies**, engineered to position the company as a strategic **solution partner** for global enterprise leaders and high-growth scale-ups. Built with a dark luxury gold aesthetic (`#D4AF37`), fluid 3D carousel animations, GPU-accelerated scroll reveals, interactive performance analytics, and mobile-optimized responsive architecture.
 
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-revamp--riyadvi.vercel.app-D4AF37?style=for-the-badge)](https://revamp-riyadvi.vercel.app/)
+[![GitHub Repo](https://img.shields.io/badge/GitHub-aravind7lee%2FRevamp--Riyadvi-181717?style=for-the-badge&logo=github)](https://github.com/aravind7lee/Revamp-Riyadvi)
+
 ---
+
 
 ## 🎨 Design & Visual Aesthetics
 
@@ -66,7 +71,7 @@ A high-performance, full-stack enterprise digital platform revamp for **Riyadvi 
 
 ### Step 1: Clone Repository
 ```bash
-git clone https://github.com/YOUR_USERNAME/Revamp-Riyadvi.git
+git clone https://github.com/aravind7lee/Revamp-Riyadvi.git
 cd Revamp-Riyadvi
 ```
 
